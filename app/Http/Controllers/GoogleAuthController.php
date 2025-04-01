@@ -43,17 +43,9 @@ class GoogleAuthController extends Controller
             ['timeCreated' => now()]
         );
 
-
-
-        // Đăng nhập user
         Auth::login($user);
 
         return redirect()->route('dashboard');
-        // } //catch (\Exception $e) {
-        // return response()->json(['error' => 'error', 'message' => $e->getMessage()], 401);
-        // Log::error('Google Login Error: ' . $e->getMessage()); // Ghi log lỗi
-        //return redirect()->route('home')->with('error', 'Đăng nhập thất bại!');
-        //}
     }
 
     /**
