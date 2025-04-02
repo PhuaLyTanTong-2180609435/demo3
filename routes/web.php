@@ -5,7 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\GoogleAuthController;
 
 Route::middleware(['web'])->group(function () {
-    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 });
 Route::get('/', function () {

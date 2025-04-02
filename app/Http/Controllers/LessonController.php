@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Course;
+use App\Models\Lesson;
 
-class CourseController extends Controller
+class LessonController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,9 +13,9 @@ class CourseController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->query('per_page', 10); // Số lượng phần tử trên mỗi trang (mặc định là 10)
-        $courses = Course::paginate($perPage);
+        $lesson = Lesson::paginate($perPage);
 
-        return response()->json($courses);
+        return response()->json($lesson);
     }
 
     /**
@@ -32,17 +32,21 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'idAccount' => 'required|integer',
-            'idIndustryType' => 'required|integer',
-            'idPriorityType' => 'required|integer',
+            'idCourse' => 'required|integer',
             'idCopyrightType' => 'required|integer',
             'idStatusType' => 'required|integer',
-            'courseName' => 'required|string',
+            'lessonName' => 'required|string|max:255',
+            'videoAddress' => 'nullable|string',
             'description' => 'nullable|string',
+            'quantityView' => 'integer',
+            'quantityComment' => 'integer',
+            'quantityFavorite' => 'integer',
+            'quantityShared' => 'integer',
+            'quantitySaved' => 'integer',
         ]);
 
-        $course = Course::create($validatedData);
-        return response()->json($course, 201);
+        $lesson = Lesson::create($validatedData);
+        return response()->json($lesson, 201);
     }
 
     /**
@@ -50,11 +54,8 @@ class CourseController extends Controller
      */
     public function show(string $id)
     {
-        $course = Course::find($id);
-        if (!$course) {
-            return response()->json(['message' => 'Course not found'], 404);
-        }
-        return response()->json($course);
+        $lesson = Lesson::findOrFail($id);
+        return response()->json($lesson);
     }
 
     /**
@@ -70,23 +71,25 @@ class CourseController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $course = Course::find($id);
-        if (!$course) {
-            return response()->json(['message' => 'Course not found'], 404);
-        }
+        $lesson = Lesson::findOrFail($id);
 
         $validatedData = $request->validate([
-            'idAccount' => 'integer',
-            'idIndustryType' => 'integer',
-            'idPriorityType' => 'integer',
+            'idCourse' => 'integer',
             'idCopyrightType' => 'integer',
             'idStatusType' => 'integer',
-            'courseName' => 'string',
+            'lessonName' => 'string|max:255',
+            'videoAddress' => 'nullable|string',
             'description' => 'nullable|string',
+            'quantityView' => 'integer',
+            'quantityComment' => 'integer',
+            'quantityFavorite' => 'integer',
+            'quantityShared' => 'integer',
+            'quantitySaved' => 'integer',
+            'timeCreated' => 'date',
         ]);
 
-        $course->update($validatedData);
-        return response()->json($course);
+        $lesson->update($validatedData);
+        return response()->json($lesson);
     }
 
     /**
@@ -94,12 +97,8 @@ class CourseController extends Controller
      */
     public function destroy(string $id)
     {
-        $course = Course::find($id);
-        if (!$course) {
-            return response()->json(['message' => 'Course not found'], 404);
-        }
-
-        $course->delete();
-        return response()->json(['message' => 'Course deleted successfully']);
+        $lesson = Lesson::findOrFail($id);
+        $lesson->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }
