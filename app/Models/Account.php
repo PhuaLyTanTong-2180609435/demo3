@@ -46,6 +46,15 @@ class Account extends Authenticatable implements JWTSubject
     }
     public function getJWTCustomClaims()
     {
-        return [];
+
+        $role = $this->roles()->select('Role.roleName')->first();
+
+        return [
+            'birthday' => $this->birthday,
+            'description' => $this->description,
+            'accountName' => $this->accountName,
+            'email'   => $this->email,
+            'role' => $role ? $role->roleName : 'unknown',
+        ];
     }
 }

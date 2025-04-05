@@ -40,25 +40,13 @@ class GoogleAuthApiController extends Controller
                 ['idAccount' => $user->idAccount, 'idRole' => 1],
                 ['timeCreated' => now()]
             );
-            $role = $user->roles()->select('Role.idRole', 'Role.roleName')->first();
             // Tạo token đăng nhập
             $token = auth('api')->login($user);
 
             return response()->json([
                 'message' => 'Đăng nhập thành công',
                 'token' => $token,
-                'user' => [
-                    'idAccount' => $user->idAccount,
-                    'email' => $user->email,
-                    'accountName' => $user->accountName,
-                    'name' => $user->name,
-                    'description' => $user->description,
-                    'timeCreated' => $user->timeCreated,
-                    'role' => [
-                        'id' => $role ? $role->idRole : null,
-                        'name' => $role ? $role->roleName : 'Chưa có vai trò',
-                    ],
-                ],
+
             ], 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             \Log::error('Google Auth Error: ' . $e->getMessage());

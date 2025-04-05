@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
+Route::middleware(['auth:api', 'role:admin'])->get('/admin', function () {
+    return response()->json(['message' => 'Welcome Admin']);
+});
+
+Route::middleware(['auth:api', 'role:user'])->get('/user', function () {
+    return response()->json(['message' => 'Welcome User']);
+});
+
 
 Route::middleware('guest')->group(function () {
 
