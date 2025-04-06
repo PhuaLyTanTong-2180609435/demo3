@@ -39,7 +39,6 @@ class Account extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Role::class, 'RoleDetails', 'idAccount', 'idRole');
     }
-
     public function getJWTIdentifier()
     {
         return $this->getKey();

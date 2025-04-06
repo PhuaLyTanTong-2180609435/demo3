@@ -17,12 +17,5 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     })->name('dashboard');
 });
 
-// Đối với api authentication
-Route::middleware(['auth:api', 'role:Admin'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-});
-
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
