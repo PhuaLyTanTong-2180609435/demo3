@@ -10,9 +10,12 @@ class StatusTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->query('per_page', 10);
+        $priorityType = StatusType::paginate($perPage);
+
+        return response()->json($priorityType);
     }
 
     /**

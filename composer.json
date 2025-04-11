@@ -15,6 +15,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.19",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "3.0",
+        "masbug/flysystem-google-drive-ext": "^2.4",
         "tightenco/ziggy": "^2.4",
         "tymon/jwt-auth": "^2.2"
     },
