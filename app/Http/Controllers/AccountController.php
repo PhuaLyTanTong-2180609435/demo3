@@ -45,7 +45,7 @@ class AccountController extends Controller
 
         return response()->json($account->load('roles'), 201); // Trả về tài khoản với các vai trò
     }
-
+    
     /**
      * Display the specified resource.
      */

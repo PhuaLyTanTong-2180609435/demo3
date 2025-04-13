@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HistoryActionCourse extends Model
 {
     use HasFactory;
+    public $timestamps = false;
     protected $table = 'HistoryActionCourse';
     protected $primaryKey = null;
     public $incrementing = false;

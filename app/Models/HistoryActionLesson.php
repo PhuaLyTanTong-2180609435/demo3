@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class HistoryActionLesson extends Model
 {
     use HasFactory;
+    public $timestamps = false;
     protected $table = 'HistoryActionLesson';
-    protected $primaryKey = null;
+    protected $primaryKey = 'idHistoryLesson';
     public $incrementing = false;
     protected $fillable = ['idAccount', 'idLesson', 'idActionType', 'timeCreated'];
 }

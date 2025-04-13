@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActionType;
+use App\Models\Course;
+use App\Models\HistoryActionLesson;
 use Illuminate\Http\Request;
 use App\Models\Lesson;
 use Illuminate\Support\Facades\Storage;
@@ -28,7 +31,7 @@ class LessonController extends Controller
 
     public function random(Request $request)
     {
-        $limit = $request->query('limit', 5);
+        $limit = $request->query('limit', 3);
         $lessons = Lesson::whereNotNull('videoAddress')->inRandomOrder()->limit($limit)->get();
 
         $s3Disk = Storage::disk('s3');
@@ -40,8 +43,11 @@ class LessonController extends Controller
             $signedUrl = $s3Disk->temporaryUrl($videoPath, now()->addMinutes(30));
 
             return [
-                'id' => $lesson->id,
+                'id' => $lesson->idLesson,
+                'idCourse' => $lesson->idCourse,
                 'lessonName' => $lesson->lessonName,
+                'quatityView' => $lesson->quantityView,
+                'quatityfavorite' => $lesson->quantityFavorite,
                 'description' => $lesson->description,
                 'videoUrl' => $signedUrl,
             ];
@@ -50,6 +56,71 @@ class LessonController extends Controller
         return response()->json($response);
     }
 
+    //tăng lượng view
+    public function increaseView(string $id)
+    {
+        $lesson = Lesson::findOrFail($id);
+        $lesson->increment('quantityView');
+        return response()->json([
+            'message' => 'View count increased',
+            'quantityView' => $lesson->quantityView,
+        ]);
+    }
+
+    //Yêu thích và bỏ yêu thích
+    public function toggleFavorite(Request $request, string $idLesson)
+    {
+        $userId = $request->input('idAccount'); // Lấy từ FE
+
+        if (!$userId) {
+            return response()->json(['error' => 'idAccount is required'], 400);
+        }
+
+        $favoriteTypeId = ActionType::where('actionTypeName', 'AddFavorite')->value('idActionType');
+
+        $history = HistoryActionLesson::where([
+            'idAccount' => $userId,
+            'idLesson' => $idLesson,
+            'idActionType' => $favoriteTypeId,
+        ])->first();
+
+        $lesson = Lesson::findOrFail($idLesson);
+
+        if ($history) {
+            // Bỏ yêu thích
+            $history->delete();
+            $lesson->decrement('quantityFavorite');
+            $status = 'unfavorited';
+        } else {
+            // Thêm yêu thích
+            HistoryActionLesson::create([
+                'idAccount' => $userId,
+                'idLesson' => $idLesson,
+                'idActionType' => $favoriteTypeId,
+            ]);
+            $lesson->increment('quantityFavorite');
+            $status = 'favorited';
+        }
+
+        return response()->json([
+            'message' => "Lesson has been {$status}.",
+            'quantityFavorite' => $lesson->quantityFavorite,
+        ]);
+    }
+    public function checkFavorite(Request $request)
+    {
+        $request->validate([
+            'idLesson' => 'required|integer',
+            'idAccount' => 'required|integer',
+        ]);
+
+        $isFavorite = HistoryActionLesson::where('idLesson', $request->idLesson)
+            ->where('idAccount', $request->idAccount)
+            ->where('idActionType', 9) // ID của AddFavorite
+            ->exists();
+
+        return response()->json(['isFavorite' => $isFavorite]);
+    }
     // public function storeWithVideo(Request $request)
     // {
     //     $validatedData = $request->validate([
@@ -194,9 +265,45 @@ class LessonController extends Controller
     public function show(string $id)
     {
         $lesson = Lesson::findOrFail($id);
-        return response()->json($lesson);
-    }
 
+        // Tạo signed URL nếu videoAddress tồn tại
+        $s3Disk = Storage::disk('s3');
+        $videoUrl = $lesson->videoAddress;
+
+        if ($videoUrl) {
+            // Lấy path từ URL (bỏ base URL của S3)
+            $videoPath = ltrim(parse_url($videoUrl, PHP_URL_PATH), '/');
+            // Tạo signed URL với thời hạn (ví dụ: 30 phút)
+            $videoUrl = $s3Disk->temporaryUrl($videoPath, now()->addMinutes(30));
+        }
+
+        // Tạo response với signed URL
+        $response = [
+            'idLesson' => $lesson->idLesson,
+            'idCourse' => $lesson->idCourse,
+            'lessonName' => $lesson->lessonName,
+            'videoAddress' => $videoUrl, // Signed URL
+            'description' => $lesson->description,
+            'quantityView' => $lesson->quantityView,
+            'quantityComment' => $lesson->quantityComment,
+            'quantityFavorite' => $lesson->quantityFavorite,
+            'quantityShared' => $lesson->quantityShared,
+            'quantitySaved' => $lesson->quantitySaved,
+            'timeCreated' => $lesson->timeCreated,
+        ];
+
+        return response()->json($response);
+    }
+    public function getLessonsByCourse($idCourse)
+    {
+        $course = Course::with('lessons')->find($idCourse);
+
+        if (!$course) {
+            return response()->json(['message' => 'Course not found'], 404);
+        }
+
+        return response()->json($course->lessons);
+    }
     /**
      * Show the form for editing the specified resource.
      */

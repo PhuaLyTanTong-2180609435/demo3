@@ -12,11 +12,17 @@ use App\Http\Controllers\StatusTypeController;
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Storage;
 
+//coures
 Route::apiResource('courses', CourseController::class);
-
+Route::get('/course/{idCourse}/lessons', [LessonController::class, 'getLessonsByCourse']);
+Route::get('/account/{idAcount}/course', [CourseController::class, 'getCourseByAccount']);
+//lesson
 Route::apiResource('lessons', LessonController::class);
 Route::get('/lesson/random', [LessonController::class, 'random']);
-
+Route::post('/lesson/{id}/view', [LessonController::class, 'increaseView']);
+Route::post('/lesson/{id}/favorite', [LessonController::class, 'toggleFavorite']);
+Route::post('/lesson/check-favorite', [LessonController::class, 'checkFavorite']);
+//
 Route::apiResource('copyrighttypes', CopyrightTypeController::class);
 
 Route::apiResource('industrytypes', IndustryTypeController::class);

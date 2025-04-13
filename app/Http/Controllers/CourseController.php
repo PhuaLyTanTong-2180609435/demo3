@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Models\Course;
 
@@ -89,6 +90,16 @@ class CourseController extends Controller
         return response()->json($course);
     }
 
+    public function getCourseByAccount($idAccout)
+    {
+        $account = Account::with('courses')->find($idAccout);
+
+        if (!$account) {
+            return response()->json(['message' => 'Account not found'], 404);
+        }
+
+        return response()->json($account->courses);
+    }
     /**
      * Remove the specified resource from storage.
      */

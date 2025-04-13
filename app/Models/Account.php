@@ -61,4 +61,8 @@ class Account extends Authenticatable implements JWTSubject
             'roles' => $roles,
         ];
     }
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'idAccount', 'idAccount');
+    }
 }

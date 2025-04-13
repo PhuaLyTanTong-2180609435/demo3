@@ -12,4 +12,8 @@ class Course extends Model
     protected $primaryKey = 'idCourse';
     public $timestamps = false;
     protected $fillable = ['idAccount', 'idIndustryType', 'idPriorityType', 'idCopyrightType', 'idStatusType', 'courseName', 'description', 'quantityFollow', 'quantityView', 'quantityComment', 'quantityFavorite', 'quantityShared', 'quantitySaved', 'timeCreated'];
+    public function lessons()
+    {
+        return $this->hasMany(Lesson::class, 'idCourse', 'idCourse');
+    }
 }
